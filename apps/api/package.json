@@ -11,7 +11,8 @@
     "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format:check": "prettier . --check",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "lint": "eslint ."
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
