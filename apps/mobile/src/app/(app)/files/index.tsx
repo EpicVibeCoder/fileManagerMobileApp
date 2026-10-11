@@ -77,7 +77,7 @@ export default function FilesScreen() {
       await pickAndUpload(null);
       refresh();
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Upload failed');
+      setError(e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Upload failed');
     } finally {
       setBusy(false);
     }
@@ -90,7 +90,9 @@ export default function FilesScreen() {
       await createFolder(null);
       refresh();
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Could not create folder');
+      setError(
+        e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Could not create folder',
+      );
     } finally {
       setBusy(false);
     }

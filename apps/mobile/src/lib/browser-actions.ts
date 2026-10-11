@@ -1,5 +1,5 @@
 import * as DocumentPicker from 'expo-document-picker';
-import { File, Paths } from 'expo-file-system';
+import { File, Paths, UploadType } from 'expo-file-system';
 import { Alert, Platform, Share } from 'react-native';
 
 import { askForName } from '@/components/name-prompt';
@@ -7,7 +7,77 @@ import { ApiError } from '@/lib/api/client';
 import { favoritesApi, filesApi, foldersApi, vaultApi } from '@/lib/api/endpoints';
 import { getApiBaseUrl } from '@/lib/config';
 import { loadTokens } from '@/lib/storage';
-import type { FileItem, FolderItem } from '@/lib/types';
+import type { ApiEnvelope, FileItem, FolderItem } from '@/lib/types';
+
+const EXT_MIME: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  pdf: 'application/pdf',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+};
+
+/** Android pickers often omit mimeType or send image/jpg / octet-stream. */
+function resolveUploadMime(mimeType: string | undefined | null, name: string): string {
+  const normalized = mimeType === 'image/jpg' ? 'image/jpeg' : mimeType;
+  if (normalized && normalized !== 'application/octet-stream') return normalized;
+  const ext = name.split('.').pop()?.toLowerCase();
+  return (ext && EXT_MIME[ext]) || normalized || 'application/octet-stream';
+}
+
+/** Sanitize display name for API / UI. */
+function safeFileName(name: string): string {
+  const cleaned = name.replace(/[/\\?%*:|"<>]/g, '_').trim();
+  return cleaned || 'upload.bin';
+}
+
+/**
+ * DocumentPicker cache URIs are readable by native File.upload, but not by
+ * copyAsync/bytes() in Expo Go. Upload in place and send the real name as a form field.
+ */
+async function uploadFilesNative(
+  assets: { uri: string; name: string; mimeType: string }[],
+  folderId?: string | null,
+): Promise<FileItem[]> {
+  const url = `${getApiBaseUrl()}/api/files/upload`;
+  const saved: FileItem[] = [];
+
+  for (const asset of assets) {
+    const { accessToken } = await loadTokens();
+    const file = new File(asset.uri);
+    const parameters: Record<string, string> = { name: asset.name };
+    if (folderId) parameters.folderId = folderId;
+
+    const result = await file.upload(url, {
+      httpMethod: 'POST',
+      uploadType: UploadType.MULTIPART,
+      fieldName: 'file',
+      mimeType: asset.mimeType,
+      headers: {
+        Accept: 'application/json',
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
+      parameters,
+    });
+
+    let json: ApiEnvelope<FileItem[]> | null = null;
+    try {
+      json = JSON.parse(result.body) as ApiEnvelope<FileItem[]>;
+    } catch {
+      json = null;
+    }
+
+    if (result.status >= 400 || json?.success === false) {
+      throw new ApiError(json?.message ?? `Upload failed (${result.status})`, result.status, json);
+    }
+    if (json?.data?.length) saved.push(...json.data);
+  }
+
+  return saved;
+}
 
 export async function pickAndUpload(folderId?: string | null) {
   const result = await DocumentPicker.getDocumentAsync({
@@ -22,17 +92,34 @@ export async function pickAndUpload(folderId?: string | null) {
   });
   if (result.canceled || !result.assets?.length) return null;
 
-  const formData = new FormData();
-  for (const asset of result.assets) {
-    formData.append('file', {
-      uri: asset.uri,
-      name: asset.name ?? 'upload.bin',
-      type: asset.mimeType ?? 'application/octet-stream',
-    } as unknown as Blob);
+  if (Platform.OS === 'web') {
+    const formData = new FormData();
+    for (const asset of result.assets) {
+      const name = safeFileName(asset.name ?? 'upload.bin');
+      if (asset.file) {
+        formData.append('file', asset.file, name);
+      } else {
+        const res = await fetch(asset.uri);
+        const blob = await res.blob();
+        formData.append(
+          'file',
+          new Blob([await blob.arrayBuffer()], { type: resolveUploadMime(asset.mimeType, name) }),
+          name,
+        );
+      }
+    }
+    if (folderId) formData.append('folderId', folderId);
+    return filesApi.upload(formData);
   }
-  if (folderId) formData.append('folderId', folderId);
 
-  return filesApi.upload(formData);
+  return uploadFilesNative(
+    result.assets.map((asset) => ({
+      uri: asset.uri,
+      name: safeFileName(asset.name ?? 'upload.bin'),
+      mimeType: resolveUploadMime(asset.mimeType, asset.name ?? 'upload.bin'),
+    })),
+    folderId,
+  );
 }
 
 export async function downloadAndShare(file: FileItem, vaultPin?: string | null) {

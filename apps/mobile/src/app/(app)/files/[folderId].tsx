@@ -54,7 +54,13 @@ export default function FolderScreen() {
               await pickAndUpload(folderId);
               refresh();
             } catch (e) {
-              setError(e instanceof ApiError ? e.message : 'Upload failed');
+              setError(
+                e instanceof ApiError
+                  ? e.message
+                  : e instanceof Error
+                    ? e.message
+                    : 'Upload failed',
+              );
             } finally {
               setBusy(false);
             }

@@ -95,15 +95,26 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     body: formData ?? (body !== undefined ? JSON.stringify(body) : undefined),
   };
 
-  let res = await fetch(url, init);
+  let res: Response;
+  try {
+    res = await fetch(url, init);
+  } catch (e) {
+    const detail = e instanceof Error ? e.message : 'Network request failed';
+    throw new ApiError(`${detail} (${getApiBaseUrl()})`, 0);
+  }
   let json = (await res.json().catch(() => null)) as ApiEnvelope<T> | null;
 
   if (res.status === 401 && auth && !skipRefresh) {
     const nextToken = await refreshAccessToken();
     if (nextToken) {
       reqHeaders.Authorization = `Bearer ${nextToken}`;
-      res = await fetch(url, { ...init, headers: reqHeaders });
-      json = (await res.json().catch(() => null)) as ApiEnvelope<T> | null;
+      try {
+        res = await fetch(url, { ...init, headers: reqHeaders });
+        json = (await res.json().catch(() => null)) as ApiEnvelope<T> | null;
+      } catch (e) {
+        const detail = e instanceof Error ? e.message : 'Network request failed';
+        throw new ApiError(`${detail} (${getApiBaseUrl()})`, 0);
+      }
     }
   }
 

@@ -21,6 +21,12 @@ const errorHandler = (err, req, res, next) => {
             return sendResponse(res, 400, false, message, null, { details: err.code });
       }
 
+      if (err.code === 'EACCES') {
+            return sendResponse(res, 500, false, 'Upload storage is not writable on the server', null, {
+                  details: err.message,
+            });
+      }
+
       if (err.name === 'JsonWebTokenError') {
             return sendResponse(res, 401, false, 'Invalid token', null, { details: 'Authentication failed' });
       }

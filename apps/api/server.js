@@ -25,6 +25,21 @@ const PORT = process.env.PORT || 8080;
 connectDB();
 // Validate required environment variables
 validateEnv();
+
+// Ensure local uploads dir exists and is writable (Docker often leaves it root-owned)
+const fs = require('fs');
+const path = require('path');
+const uploadsRoot = path.join(__dirname, 'uploads');
+try {
+  fs.mkdirSync(uploadsRoot, { recursive: true });
+  fs.accessSync(uploadsRoot, fs.constants.W_OK);
+} catch (err) {
+  console.error(
+    `Uploads directory is not writable (${uploadsRoot}): ${err.message}. ` +
+      'Fix ownership, e.g. docker run --rm -v "$PWD/uploads:/uploads" alpine chown -R $(id -u):$(id -g) /uploads',
+  );
+  process.exit(1);
+}
 // Security middleware
 app.use(helmet());
 

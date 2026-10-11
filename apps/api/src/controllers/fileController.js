@@ -16,6 +16,11 @@ const uploadFile = async (req, res) => {
             const files = req.files;
             const userId = req.user._id;
             const { folderId } = req.body;
+            // Mobile native upload sends display name separately (picker URI basename is a UUID).
+            const overrideName =
+                  files.length === 1 && typeof req.body.name === 'string' ? req.body.name.trim() : '';
+
+            const displayNameFor = (file) => overrideName || file.originalname;
 
             // 1. Calculate total size of all files
             const totalUploadSize = files.reduce((acc, file) => acc + file.size, 0);
@@ -46,7 +51,8 @@ const uploadFile = async (req, res) => {
 
             // 4. Process each file
             for (const file of files) {
-                  const { size, path: filePath, mimetype, originalname } = file;
+                  const { size, path: filePath, mimetype } = file;
+                  const displayName = displayNameFor(file);
 
                   // Determine type
                   let type = 'doc';
@@ -55,24 +61,17 @@ const uploadFile = async (req, res) => {
 
                   // Check if file with same name exists in target folder/root
                   const existingFile = await File.findOne({
-                        name: originalname,
+                        name: displayName,
                         type: type,
                         userId: userId,
                         folderId: folderId || null,
                   });
 
                   if (existingFile) {
-                        // For bulk upload, if one fails, current requirement implies we might want to stop or skip.
-                        // Common pattern: Fail the whole batch or return partial success.
-                        // Given user request "Respond with appropriate error", fail batch is safer for consistency.
-                        // Cleanup ALL uploaded files (including those processed so far in this request? No, usually just the temp ones)
-                        // Actually, we haven't saved any to DB yet, but physical files exist.
-                        // Let's cleanup EVERYTHING and return error.
-
                         files.forEach((f) => {
                               if (fs.existsSync(f.path)) fs.unlinkSync(f.path);
                         });
-                        return sendResponse(res, 400, false, `File '${originalname}' already exists in this destination`);
+                        return sendResponse(res, 400, false, `File '${displayName}' already exists in this destination`);
                   }
 
                   uploadedFiles.push(file); // Track for cleanup in catch block
@@ -80,13 +79,14 @@ const uploadFile = async (req, res) => {
 
             // 5. Save all to DB
             for (const file of files) {
-                  const { size, path: filePath, mimetype, originalname } = file;
+                  const { size, path: filePath, mimetype } = file;
+                  const displayName = displayNameFor(file);
                   let type = 'doc';
                   if (mimetype.startsWith('image/')) type = 'image';
                   else if (mimetype === 'application/pdf') type = 'pdf';
 
                   const newFile = new File({
-                        name: originalname,
+                        name: displayName,
                         type,
                         size,
                         path: filePath,
