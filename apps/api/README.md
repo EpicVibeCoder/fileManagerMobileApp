@@ -2,68 +2,53 @@
 
 A robust Node.js API for secure file storage, implementing folder management, file operations, Favorites, Dashboard, a secure Vault, and Calendar integration.
 
-## 🚀 Getting Started (Docker) - Recommended
+## Development (recommended)
 
-The easiest way to run the application is using Docker. This ensures all dependencies (Node.js, MongoDB) are set up correctly.
+Run **MongoDB in Docker** and the **API with nodemon** on the host.
 
 ### Prerequisites
 
-- [Docker](https://www.docker.com/get-started) installed and running.
+- [Docker](https://www.docker.com/get-started) installed and running
+- Node.js (see root `package.json` engines)
 
-### Installation
+### Setup
 
-1.    **Configure Environment Variables**:
-      Copy the example environment file to create your local configuration:
+1. Copy env and set a real `JWT_SECRET` (not the placeholder):
 
-      ```bash
-      cp .env.example .env
-      ```
+   ```bash
+   cp .env.example .env
+   ```
 
-      Open `.env` and fill in your details:
-      - **Google OAuth**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (Required for Phase 4)
-      - **Email (SMTP)**: `SMTP_USER`, `SMTP_PASS` (Required for OTP/Password Reset)
+   Keep `MONGODB_URI=mongodb://localhost:27017/filemanager` for local nodemon + Docker Mongo.
 
-2.    **Run with Docker**:
-      Build and start the containers:
+2. From the **monorepo root**:
 
-      ```bash
-      docker compose up --build
-      ```
+   ```bash
+   npm run dev
+   ```
 
-3.    **Access the API**:
-      The server will be running at `http://localhost:8080`.
-      MongoDB will be running at `mongodb://localhost:27017/filemanager`.
+   This starts Mongo (`docker-compose.mongo.yml`), then Turbo `dev` (API nodemon + mobile Expo).
+
+   Useful scripts from root:
+
+   | Script | What it does |
+   | ------ | ------------ |
+   | `npm run db:up` | Start Mongo only |
+   | `npm run db:down` | Stop Mongo |
+   | `npm run dev` | Mongo + API + mobile |
+   | `npm run dev:api` | Mongo + API only |
+   | `npm run docker:up` | Full stack in Docker (API container + Mongo) |
+
+3. API: `http://localhost:8080` · Mongo: `mongodb://localhost:27017/filemanager`
 
 ---
 
-## 🛠️ Manual Setup (Local Node.js)
+## Full Docker (API + Mongo)
 
-If you prefer to run the application without Docker:
-
-### Prerequisites
-
-- Node.js (Latest LTS)
-- MongoDB installed and running locally.
-
-### Installation
-
-1.    **Install Dependencies**:
-
-      ```bash
-      npm install
-      ```
-
-2.    **Configure Environment**:
-      - Copy `.env.example` to `.env`.
-      - Update `MONGODB_URI` if your local MongoDB is not at the default address.
-
-3.    **Start the Server**:
-      ```bash
-      npm start
-      # OR for development with auto-reload:
-      npm run dev
-      ```
-
+```bash
+# from apps/api, or: npm run docker:up (from root)
+docker compose up --build
+```
 ---
 
 ## 🧪 API Documentation & Testing

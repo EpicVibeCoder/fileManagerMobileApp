@@ -3,7 +3,13 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "db:up": "npm run db:up -w filemanager",
+    "db:down": "npm run db:down -w filemanager",
+    "dev": "npm run db:up && turbo run dev",
+    "dev:api": "npm run db:up && turbo run dev --filter=filemanager",
+    "dev:mobile": "turbo run dev --filter=mobile",
+    "docker:up": "npm run docker:up -w filemanager",
+    "docker:down": "npm run docker:down -w filemanager",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
@@ -11,7 +17,8 @@
   "devDependencies": {
     "prettier": "3.9.6",
     "turbo": "^2.11.7",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "@babel/core": "7.29.7"
   },
   "engines": {
     "node": ">=24"
@@ -21,6 +28,9 @@
       "name": "npm",
       "version": "11.12.1"
     }
+  },
+  "overrides": {
+    "@babel/core": "7.29.7"
   },
   "workspaces": [
     "apps/*",

@@ -1,0 +1,16 @@
+# MongoDB only — use for local API development with nodemon.
+# Full stack (API + Mongo): docker compose up --build
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: filemanager-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: filemanager
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
