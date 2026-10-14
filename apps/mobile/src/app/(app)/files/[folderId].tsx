@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
 import { FileRow } from '@/components/file-row';
+import { FolderIcon, FolderPlusIcon, UploadIcon } from '@/components/icons';
 import { Button, EmptyState, ErrorText, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 import { ApiError } from '@/lib/api/client';
 import { foldersApi } from '@/lib/api/endpoints';
 import {
@@ -18,9 +20,12 @@ import {
 } from '@/lib/browser-actions';
 import { useVault } from '@/lib/vault-context';
 
+const ACCENT = '#1B6EF3';
+
 export default function FolderScreen() {
   const { folderId } = useLocalSearchParams<{ folderId: string }>();
   const navigation = useNavigation();
+  const theme = useTheme();
   const { pin } = useVault();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +52,7 @@ export default function FolderScreen() {
           title="Upload"
           loading={busy}
           flex
+          icon={<UploadIcon size={18} color="#fff" />}
           onPress={async () => {
             setBusy(true);
             setError(null);
@@ -71,6 +77,7 @@ export default function FolderScreen() {
           variant="secondary"
           disabled={busy}
           flex
+          icon={<FolderPlusIcon size={18} color={theme.text} />}
           onPress={async () => {
             setBusy(true);
             try {
@@ -90,7 +97,11 @@ export default function FolderScreen() {
         refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={refresh} />}
       >
         {!folders.length && !files.length && !query.isLoading ? (
-          <EmptyState title="Empty folder" />
+          <EmptyState
+            title="Empty folder"
+            subtitle="Upload files or add a subfolder"
+            icon={<FolderIcon size={28} color={ACCENT} />}
+          />
         ) : null}
         {folders.map((folder) => (
           <FileRow

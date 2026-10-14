@@ -1,18 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import { router } from 'expo-router';
 
 import { FileRow } from '@/components/file-row';
+import { LockIcon, ShieldIcon, VaultIcon } from '@/components/icons';
 import { ThemedText } from '@/components/themed-text';
 import { Button, EmptyState, ErrorText, Field, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 import { ApiError } from '@/lib/api/client';
 import { vaultApi } from '@/lib/api/endpoints';
 import { showFileActions, showFolderActions } from '@/lib/browser-actions';
 import { useVault } from '@/lib/vault-context';
 
+const ACCENT = '#1B6EF3';
+
 export default function VaultScreen() {
+  const theme = useTheme();
   const { pin, isUnlocked, unlock, lock } = useVault();
   const [inputPin, setInputPin] = useState('');
   const [mode, setMode] = useState<'unlock' | 'set'>('unlock');
@@ -48,14 +53,19 @@ export default function VaultScreen() {
   if (!isUnlocked || !pin) {
     return (
       <Screen>
-        <ThemedText type="subtitle" style={{ fontSize: 26, lineHeight: 32, marginBottom: Spacing.two }}>
-          Secure vault
-        </ThemedText>
-        <ThemedText themeColor="textSecondary" style={{ marginBottom: Spacing.four }}>
-          {mode === 'set'
-            ? 'Create a PIN (at least 4 characters) to protect private files.'
-            : 'Enter your vault PIN. It clears when the app backgrounds.'}
-        </ThemedText>
+        <View style={[styles.lockHero, { backgroundColor: theme.backgroundElement }]}>
+          <View style={[styles.lockBadge, { backgroundColor: theme.backgroundSelected }]}>
+            <VaultIcon size={32} color={ACCENT} />
+          </View>
+          <ThemedText type="subtitle" style={{ fontSize: 26, lineHeight: 32 }}>
+            Secure vault
+          </ThemedText>
+          <ThemedText themeColor="textSecondary" style={{ textAlign: 'center' }}>
+            {mode === 'set'
+              ? 'Create a PIN (at least 4 characters) to protect private files.'
+              : 'Enter your vault PIN. It clears when the app backgrounds.'}
+          </ThemedText>
+        </View>
         <Field
           label="PIN"
           secureTextEntry
@@ -69,6 +79,13 @@ export default function VaultScreen() {
           onPress={onUnlock}
           loading={busy}
           disabled={inputPin.length < 4}
+          icon={
+            mode === 'set' ? (
+              <ShieldIcon size={18} color="#fff" />
+            ) : (
+              <LockIcon size={18} color="#fff" />
+            )
+          }
         />
         <View style={{ height: Spacing.three }} />
         <Button
@@ -85,9 +102,19 @@ export default function VaultScreen() {
 
   return (
     <Screen style={{ paddingTop: Spacing.two }}>
-      <View style={styles.toolbar}>
-        <ThemedText type="smallBold">Vault unlocked</ThemedText>
-        <Button title="Lock" variant="secondary" onPress={lock} />
+      <View style={[styles.toolbar, { backgroundColor: theme.backgroundElement }]}>
+        <View style={styles.toolbarLeft}>
+          <View style={[styles.smallBadge, { backgroundColor: theme.backgroundSelected }]}>
+            <VaultIcon size={18} color={ACCENT} />
+          </View>
+          <ThemedText type="smallBold">Vault unlocked</ThemedText>
+        </View>
+        <Button
+          title="Lock"
+          variant="secondary"
+          onPress={lock}
+          icon={<LockIcon size={16} color={theme.text} />}
+        />
       </View>
       {query.isLoading ? <ActivityIndicator /> : null}
       {query.error ? (
@@ -104,6 +131,7 @@ export default function VaultScreen() {
           <EmptyState
             title="Vault is empty"
             subtitle="Long-press a file in Files and choose Move to vault"
+            icon={<VaultIcon size={28} color={ACCENT} />}
           />
         ) : null}
         {folders.map((folder) => (
@@ -139,10 +167,40 @@ export default function VaultScreen() {
 }
 
 const styles = StyleSheet.create({
+  lockHero: {
+    alignItems: 'center',
+    borderRadius: 20,
+    padding: Spacing.four,
+    gap: Spacing.two,
+    marginBottom: Spacing.four,
+  },
+  lockBadge: {
+    width: 72,
+    height: 72,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.two,
+  },
   toolbar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: Spacing.three,
+    borderRadius: 14,
+    padding: Spacing.two,
+    paddingLeft: Spacing.three,
+  },
+  toolbarLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  smallBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

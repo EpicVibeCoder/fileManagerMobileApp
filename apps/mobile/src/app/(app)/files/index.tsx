@@ -11,6 +11,14 @@ import {
 } from 'react-native';
 
 import { FileRow } from '@/components/file-row';
+import {
+  DocIcon,
+  FilesIcon,
+  FolderPlusIcon,
+  ImageIcon,
+  PdfIcon,
+  UploadIcon,
+} from '@/components/icons';
 import { ThemedText } from '@/components/themed-text';
 import { Button, EmptyState, ErrorText, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
@@ -27,11 +35,13 @@ import {
 } from '@/lib/browser-actions';
 import { useVault } from '@/lib/vault-context';
 
+const ACCENT = '#1B6EF3';
+
 const FILTERS = [
-  { key: 'all', label: 'All' },
-  { key: 'image', label: 'Images' },
-  { key: 'pdf', label: 'PDFs' },
-  { key: 'doc', label: 'Docs' },
+  { key: 'all', label: 'All', Icon: FilesIcon },
+  { key: 'image', label: 'Images', Icon: ImageIcon },
+  { key: 'pdf', label: 'PDFs', Icon: PdfIcon },
+  { key: 'doc', label: 'Docs', Icon: DocIcon },
 ] as const;
 
 export default function FilesScreen() {
@@ -54,7 +64,6 @@ export default function FilesScreen() {
 
   const rootFiles = useMemo(() => {
     const files = filesQuery.data ?? [];
-    // Root view: only files without a folder; hide vault when possible
     return files.filter((f) => !f.folderId && !f.isVault);
   }, [filesQuery.data]);
 
@@ -91,7 +100,11 @@ export default function FilesScreen() {
       refresh();
     } catch (e) {
       setError(
-        e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Could not create folder',
+        e instanceof ApiError
+          ? e.message
+          : e instanceof Error
+            ? e.message
+            : 'Could not create folder',
       );
     } finally {
       setBusy(false);
@@ -103,8 +116,21 @@ export default function FilesScreen() {
   return (
     <Screen style={{ paddingTop: Spacing.two }}>
       <View style={styles.toolbar}>
-        <Button title="Upload" onPress={onUpload} loading={busy} flex />
-        <Button title="New folder" onPress={onNewFolder} variant="secondary" disabled={busy} flex />
+        <Button
+          title="Upload"
+          onPress={onUpload}
+          loading={busy}
+          flex
+          icon={<UploadIcon size={18} color="#fff" />}
+        />
+        <Button
+          title="New folder"
+          onPress={onNewFolder}
+          variant="secondary"
+          disabled={busy}
+          flex
+          icon={<FolderPlusIcon size={18} color={theme.text} />}
+        />
       </View>
 
       <ScrollView
@@ -113,23 +139,26 @@ export default function FilesScreen() {
         style={styles.filters}
         contentContainerStyle={{ gap: Spacing.two }}
       >
-        {FILTERS.map((f) => (
-          <Pressable
-            key={f.key}
-            onPress={() => setFilter(f.key)}
-            style={[
-              styles.chip,
-              {
-                backgroundColor:
-                  filter === f.key ? '#1B6EF3' : theme.backgroundElement,
-              },
-            ]}
-          >
-            <ThemedText style={{ color: filter === f.key ? '#fff' : theme.text }} type="smallBold">
-              {f.label}
-            </ThemedText>
-          </Pressable>
-        ))}
+        {FILTERS.map((f) => {
+          const active = filter === f.key;
+          return (
+            <Pressable
+              key={f.key}
+              onPress={() => setFilter(f.key)}
+              style={[
+                styles.chip,
+                {
+                  backgroundColor: active ? ACCENT : theme.backgroundElement,
+                },
+              ]}
+            >
+              <f.Icon size={14} color={active ? '#fff' : theme.text} />
+              <ThemedText style={{ color: active ? '#fff' : theme.text }} type="smallBold">
+                {f.label}
+              </ThemedText>
+            </Pressable>
+          );
+        })}
       </ScrollView>
 
       <ErrorText message={error} />
@@ -145,7 +174,11 @@ export default function FilesScreen() {
         contentContainerStyle={{ paddingBottom: Spacing.six }}
       >
         {!folders.length && !rootFiles.length && !loading ? (
-          <EmptyState title="Empty" subtitle="Upload files or create a folder" />
+          <EmptyState
+            title="Empty"
+            subtitle="Upload files or create a folder"
+            icon={<FilesIcon size={28} color={ACCENT} />}
+          />
         ) : null}
 
         {filter === 'all'
@@ -192,6 +225,9 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.three,
   },
   chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.one,
     borderRadius: 999,

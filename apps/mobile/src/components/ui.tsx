@@ -60,6 +60,7 @@ export function Button({
   loading,
   variant = 'primary',
   flex = false,
+  icon,
 }: {
   title: string;
   onPress: () => void;
@@ -67,10 +68,15 @@ export function Button({
   loading?: boolean;
   variant?: 'primary' | 'secondary' | 'danger';
   flex?: boolean;
+  icon?: React.ReactNode;
 }) {
   const theme = useTheme();
   const backgroundColor =
-    variant === 'primary' ? ACCENT : variant === 'danger' ? '#D94841' : theme.backgroundElement;
+    variant === 'primary'
+      ? ACCENT
+      : variant === 'danger'
+        ? '#D94841'
+        : theme.backgroundSelected;
   const color = variant === 'secondary' ? theme.text : '#ffffff';
 
   return (
@@ -86,15 +92,30 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={color} />
       ) : (
-        <ThemedText style={{ color, fontWeight: '600' }}>{title}</ThemedText>
+        <View style={styles.buttonContent}>
+          {icon}
+          <ThemedText style={{ color, fontWeight: '600' }}>{title}</ThemedText>
+        </View>
       )}
     </Pressable>
   );
 }
 
-export function EmptyState({ title, subtitle }: { title: string; subtitle?: string }) {
+export function EmptyState({
+  title,
+  subtitle,
+  icon,
+}: {
+  title: string;
+  subtitle?: string;
+  icon?: React.ReactNode;
+}) {
+  const theme = useTheme();
   return (
     <View style={styles.empty}>
+      {icon ? (
+        <View style={[styles.emptyIcon, { backgroundColor: theme.backgroundElement }]}>{icon}</View>
+      ) : null}
       <ThemedText type="subtitle" style={{ fontSize: 22, lineHeight: 28 }}>
         {title}
       </ThemedText>
@@ -147,6 +168,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: Spacing.three,
   },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
   buttonFlex: {
     flexGrow: 1,
     flexBasis: 0,
@@ -157,6 +183,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: Spacing.two,
     padding: Spacing.four,
+  },
+  emptyIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.one,
   },
   error: {
     color: '#D94841',

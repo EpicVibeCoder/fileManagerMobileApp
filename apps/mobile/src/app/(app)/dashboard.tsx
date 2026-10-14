@@ -1,8 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import { FileRow } from '@/components/file-row';
+import {
+  ChevronRightIcon,
+  ClockIcon,
+  HardDriveIcon,
+  fileTypeIcon,
+} from '@/components/icons';
 import { ThemedText } from '@/components/themed-text';
 import { EmptyState, ErrorText, Screen, formatBytes } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
@@ -10,6 +23,8 @@ import { useTheme } from '@/hooks/use-theme';
 import { ApiError } from '@/lib/api/client';
 import { dashboardApi } from '@/lib/api/endpoints';
 import { useAuth } from '@/lib/auth-context';
+
+const ACCENT = '#1B6EF3';
 
 export default function DashboardScreen() {
   const { user } = useAuth();
@@ -46,7 +61,12 @@ export default function DashboardScreen() {
 
         {storage ? (
           <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
-            <ThemedText type="smallBold">Storage</ThemedText>
+            <View style={styles.cardHeader}>
+              <View style={[styles.iconBadge, { backgroundColor: theme.backgroundSelected }]}>
+                <HardDriveIcon size={18} color={ACCENT} />
+              </View>
+              <ThemedText type="smallBold">Storage</ThemedText>
+            </View>
             <ThemedText>
               {formatBytes(storage.used)} / {formatBytes(storage.limit)}
             </ThemedText>
@@ -54,7 +74,7 @@ export default function DashboardScreen() {
               <View
                 style={[
                   styles.barFill,
-                  { width: `${Math.min(pct, 100)}%`, backgroundColor: '#1B6EF3' },
+                  { width: `${Math.min(pct, 100)}%`, backgroundColor: ACCENT },
                 ]}
               />
             </View>
@@ -67,26 +87,48 @@ export default function DashboardScreen() {
         {query.data?.fileStats?.length ? (
           <View style={styles.section}>
             <ThemedText type="smallBold">By type</ThemedText>
-            {query.data.fileStats.map((stat) => (
-              <View key={String(stat._id ?? stat.type)} style={styles.statRow}>
-                <ThemedText>{stat._id ?? stat.type}</ThemedText>
-                <ThemedText themeColor="textSecondary">
-                  {stat.count} · {formatBytes(stat.totalSize)}
-                </ThemedText>
-              </View>
-            ))}
+            {query.data.fileStats.map((stat) => {
+              const TypeIcon = fileTypeIcon(stat._id ?? stat.type);
+              return (
+                <View
+                  key={String(stat._id ?? stat.type)}
+                  style={[styles.statRow, { backgroundColor: theme.backgroundElement }]}
+                >
+                  <View style={styles.statLeft}>
+                    <View style={[styles.iconBadge, { backgroundColor: theme.backgroundSelected }]}>
+                      <TypeIcon size={18} color={ACCENT} />
+                    </View>
+                    <ThemedText>{stat._id ?? stat.type}</ThemedText>
+                  </View>
+                  <ThemedText themeColor="textSecondary">
+                    {stat.count} · {formatBytes(stat.totalSize)}
+                  </ThemedText>
+                </View>
+              );
+            })}
           </View>
         ) : null}
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText type="smallBold">Recent</ThemedText>
-            <Pressable onPress={() => router.push('/files')}>
+            <View style={styles.statLeft}>
+              <ClockIcon size={18} color={ACCENT} />
+              <ThemedText type="smallBold">Recent</ThemedText>
+            </View>
+            <Pressable
+              onPress={() => router.push('/files')}
+              style={styles.browseLink}
+            >
               <ThemedText type="linkPrimary">Browse</ThemedText>
+              <ChevronRightIcon size={16} color="#3c87f7" />
             </Pressable>
           </View>
           {!query.data?.recentItems?.length ? (
-            <EmptyState title="No recent items" subtitle="Upload a file to get started" />
+            <EmptyState
+              title="No recent items"
+              subtitle="Upload a file to get started"
+              icon={<HardDriveIcon size={28} color={ACCENT} />}
+            />
           ) : (
             query.data.recentItems.map((item) => {
               const kind = item.category === 'folder' ? 'folder' : 'file';
@@ -115,6 +157,18 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
     marginBottom: Spacing.four,
   },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  iconBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   barTrack: {
     height: 8,
     borderRadius: 999,
@@ -132,9 +186,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  browseLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
   statRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: Spacing.one,
+    alignItems: 'center',
+    padding: Spacing.two,
+    borderRadius: 12,
+  },
+  statLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
   },
 });

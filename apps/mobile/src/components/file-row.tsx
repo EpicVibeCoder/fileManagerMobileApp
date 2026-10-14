@@ -1,10 +1,13 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { FolderIcon, StarIcon, fileTypeIcon } from '@/components/icons';
 import { ThemedText } from '@/components/themed-text';
 import { formatBytes } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { FileItem, FolderItem } from '@/lib/types';
+
+const ACCENT = '#1B6EF3';
 
 type Props = {
   item: FileItem | FolderItem;
@@ -19,6 +22,7 @@ export function FileRow({ item, kind, onPress, onLongPress, onToggleFavorite, tr
   const theme = useTheme();
   const isFile = kind === 'file';
   const file = item as FileItem;
+  const TypeIcon = isFile ? fileTypeIcon(file.type) : FolderIcon;
 
   return (
     <Pressable
@@ -32,20 +36,22 @@ export function FileRow({ item, kind, onPress, onLongPress, onToggleFavorite, tr
       ]}
     >
       <View style={[styles.icon, { backgroundColor: theme.backgroundSelected }]}>
-        <ThemedText type="smallBold">{kind === 'folder' ? 'DIR' : 'FILE'}</ThemedText>
+        <TypeIcon size={22} color={ACCENT} />
       </View>
       <View style={styles.meta}>
         <ThemedText numberOfLines={1}>{item.name}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          {isFile
-            ? `${file.type ?? 'file'} · ${formatBytes(file.size)}`
-            : 'Folder'}
+          {isFile ? `${file.type ?? 'file'} · ${formatBytes(file.size)}` : 'Folder'}
           {item.isVault ? ' · vault' : ''}
         </ThemedText>
       </View>
       {onToggleFavorite ? (
         <Pressable onPress={onToggleFavorite} hitSlop={12} style={styles.fav}>
-          <ThemedText>{item.isFavorite ? '★' : '☆'}</ThemedText>
+          <StarIcon
+            size={20}
+            color={item.isFavorite ? '#E6A700' : theme.textSecondary}
+            filled={Boolean(item.isFavorite)}
+          />
         </Pressable>
       ) : null}
       {trailing}

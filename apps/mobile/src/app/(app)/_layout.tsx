@@ -1,5 +1,13 @@
 import { Tabs } from 'expo-router';
 
+import {
+  CalendarIcon,
+  FilesIcon,
+  HomeIcon,
+  StarIcon,
+  UserIcon,
+  VaultIcon,
+} from '@/components/icons';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function AppTabsLayout() {
@@ -20,12 +28,63 @@ export default function AppTabsLayout() {
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
       }}
     >
-      <Tabs.Screen name="dashboard" options={{ title: 'Home', tabBarLabel: 'Home' }} />
-      <Tabs.Screen name="files" options={{ title: 'Files', headerShown: false }} />
-      <Tabs.Screen name="favorites" options={{ title: 'Favorites' }} />
-      <Tabs.Screen name="calendar" options={{ title: 'Calendar' }} />
-      <Tabs.Screen name="vault" options={{ title: 'Vault' }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
+      <Tabs.Screen
+        name="dashboard"
+        options={{
+          title: 'Home',
+          tabBarLabel: 'Home',
+          tabBarIcon: ({ color, size }) => (
+            <HomeIcon color={String(color)} size={size ?? 22} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="files"
+        options={{
+          title: 'Files',
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <FilesIcon color={String(color)} size={size ?? 22} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="favorites"
+        options={{
+          title: 'Favorites',
+          tabBarIcon: ({ color, size }) => (
+            <StarIcon color={String(color)} size={size ?? 22} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="calendar"
+        options={{
+          title: 'Calendar',
+          tabBarIcon: ({ color, size }) => (
+            <CalendarIcon color={String(color)} size={size ?? 22} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="vault"
+        options={{
+          title: 'Vault',
+          tabBarIcon: ({ color, size }) => (
+            <VaultIcon color={String(color)} size={size ?? 22} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <UserIcon color={String(color)} size={size ?? 22} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
