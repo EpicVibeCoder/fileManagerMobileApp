@@ -3,6 +3,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
+import { ActionSheetHost } from '@/components/action-sheet';
 import { NamePromptHost } from '@/components/name-prompt';
 import { AppProviders, useAuth } from '@/lib/auth-context';
 import { VaultProvider } from '@/lib/vault-context';
@@ -33,6 +34,7 @@ function RootNavigator() {
         </Stack.Protected>
       </Stack>
       <NamePromptHost />
+      <ActionSheetHost />
     </ThemeProvider>
   );
 }

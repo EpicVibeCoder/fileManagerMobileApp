@@ -2,6 +2,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths, UploadType } from 'expo-file-system';
 import { Alert, Platform, Share } from 'react-native';
 
+import { showActionSheet } from '@/components/action-sheet';
 import { askForName } from '@/components/name-prompt';
 import { ApiError } from '@/lib/api/client';
 import { favoritesApi, filesApi, foldersApi, vaultApi } from '@/lib/api/endpoints';
@@ -210,22 +211,22 @@ export function showFileActions(
     vaultPin?: string | null;
   },
 ) {
-  Alert.alert(file.name, undefined, [
+  showActionSheet(file.name, [
     {
-      text: 'Download / Share',
+      label: 'Download / Share',
       onPress: runAction(() => downloadAndShare(file, opts.vaultPin), opts.onChanged),
     },
-    { text: 'Rename', onPress: runAction(() => renameFile(file), opts.onChanged) },
+    { label: 'Rename', onPress: runAction(() => renameFile(file), opts.onChanged) },
     {
-      text: 'Duplicate',
+      label: 'Duplicate',
       onPress: runAction(() => filesApi.duplicate(file._id), opts.onChanged),
     },
     {
-      text: file.isFavorite ? 'Unfavorite' : 'Favorite',
+      label: file.isFavorite ? 'Unfavorite' : 'Favorite',
       onPress: runAction(() => toggleFileFavorite(file), opts.onChanged),
     },
     {
-      text: file.isVault ? 'Restore from vault' : 'Move to vault',
+      label: file.isVault ? 'Restore from vault' : 'Move to vault',
       onPress: runAction(async () => {
         if (file.isVault) {
           if (!opts.vaultPin) throw new ApiError('Unlock vault first', 401);
@@ -236,14 +237,14 @@ export function showFileActions(
       }, opts.onChanged),
     },
     {
-      text: 'Delete',
-      style: 'destructive',
+      label: 'Delete',
+      destructive: true,
       onPress: runAction(async () => {
         if (!(await confirmDelete(file.name))) return;
         await filesApi.remove(file._id);
       }, opts.onChanged),
     },
-    { text: 'Cancel', style: 'cancel' },
+    { label: 'Cancel', cancel: true },
   ]);
 }
 
@@ -251,14 +252,14 @@ export function showFolderActions(
   folder: FolderItem,
   opts: { onChanged: () => void; vaultPin?: string | null },
 ) {
-  Alert.alert(folder.name, undefined, [
-    { text: 'Rename', onPress: runAction(() => renameFolder(folder), opts.onChanged) },
+  showActionSheet(folder.name, [
+    { label: 'Rename', onPress: runAction(() => renameFolder(folder), opts.onChanged) },
     {
-      text: folder.isFavorite ? 'Unfavorite' : 'Favorite',
+      label: folder.isFavorite ? 'Unfavorite' : 'Favorite',
       onPress: runAction(() => toggleFolderFavorite(folder), opts.onChanged),
     },
     {
-      text: folder.isVault ? 'Restore from vault' : 'Move to vault',
+      label: folder.isVault ? 'Restore from vault' : 'Move to vault',
       onPress: runAction(async () => {
         if (folder.isVault) {
           if (!opts.vaultPin) throw new ApiError('Unlock vault first', 401);
@@ -269,13 +270,13 @@ export function showFolderActions(
       }, opts.onChanged),
     },
     {
-      text: 'Delete',
-      style: 'destructive',
+      label: 'Delete',
+      destructive: true,
       onPress: runAction(async () => {
         if (!(await confirmDelete(folder.name))) return;
         await foldersApi.remove(folder._id);
       }, opts.onChanged),
     },
-    { text: 'Cancel', style: 'cancel' },
+    { label: 'Cancel', cancel: true },
   ]);
 }
