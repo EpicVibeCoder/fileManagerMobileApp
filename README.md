@@ -1,159 +1,114 @@
-# Turborepo starter
+# File Manager Mobile App
 
-This Turborepo starter is maintained by the Turborepo core team.
+Turborepo monorepo for a personal file manager: an **Express + MongoDB API** and an **Expo (React Native)** mobile client.
 
-## Using this example
+## Apps
 
-Run the following command:
+| App | Path | Stack |
+| --- | ---- | ----- |
+| **API** (`filemanager`) | `apps/api` | Node.js, Express, MongoDB, Multer, JWT |
+| **Mobile** (`mobile`) | `apps/mobile` | Expo SDK 57, Expo Router, React Query |
 
-```sh
-npx create-turbo@latest
+## Features
+
+- **Auth** — signup, login, logout, refresh tokens, profile, password change, OTP password reset, Google OAuth (API)
+- **Files & folders** — browse, upload (images / PDF / docs), rename, duplicate, delete, download/share
+- **Favorites** — star files and folders
+- **Dashboard** — storage usage and recent items
+- **Vault** — PIN-protected private files/folders
+- **Calendar** — browse items by created date
+- **Profile & settings** — account info, username, password
+
+## Prerequisites
+
+- Node.js **≥ 24**
+- npm **11+**
+- [Docker](https://www.docker.com/get-started) (for MongoDB)
+- Expo Go (or a development build) for the mobile app
+
+## Quick start
+
+### 1. Install
+
+```bash
+npm install
 ```
 
-## What's inside?
+### 2. Configure env
 
-This Turborepo includes the following packages/apps:
+**API** (`apps/api`):
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `@next/eslint-plugin-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+cp apps/api/.env.example apps/api/.env
 ```
 
-Without global `turbo`, use your package manager:
+Set a real `JWT_SECRET`. Keep `MONGODB_URI=mongodb://localhost:27017/filemanager` for local Mongo in Docker.
 
-```sh
-cd my-turborepo
-npx turbo build
-npm exec turbo build
-npm exec turbo build
+**Mobile** (`apps/mobile`):
+
+```bash
+cp apps/mobile/.env.example apps/mobile/.env
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+| Platform | `EXPO_PUBLIC_API_URL` |
+| -------- | -------------------- |
+| iOS simulator / web | `http://localhost:8080` |
+| Android emulator | `http://10.0.2.2:8080` |
+| Physical device | `http://<your-lan-ip>:8080` |
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+### 3. Run
 
-```sh
-turbo build --filter=docs
+From the monorepo root:
+
+```bash
+npm run dev
 ```
 
-Without global `turbo`:
+Starts MongoDB (`docker-compose.mongo.yml`), the API on **http://localhost:8080**, and Expo for the mobile app.
 
-```sh
-npx turbo build --filter=docs
-npm exec turbo build --filter=docs
-npm exec turbo build --filter=docs
+| Script | What it does |
+| ------ | ------------ |
+| `npm run dev` | Mongo + API + mobile |
+| `npm run dev:api` | Mongo + API only |
+| `npm run dev:mobile` | Expo only |
+| `npm run db:up` / `db:down` | Start / stop Mongo |
+| `npm run docker:up` / `docker:down` | Full API stack in Docker |
+| `npm run lint` | Lint workspaces |
+| `npm run check-types` | Typecheck workspaces |
+
+## API
+
+- Base URL: `http://localhost:8080`
+- Health: `GET /api/health`
+- Postman collection: `apps/api/postman_collection.json`
+- Uploads are stored under `apps/api/uploads/` (gitignored)
+
+More detail: [`apps/api/README.md`](apps/api/README.md)
+
+## Mobile
+
+```bash
+cd apps/mobile
+npm run dev      # expo start --tunnel
+npm run android
+npm run ios
+npm run web
 ```
 
-### Develop
+Long-press a file or folder for actions (rename, duplicate, favorite, vault, delete, etc.).
 
-To develop all apps and packages, run the following command:
+More detail: [`apps/mobile/README.md`](apps/mobile/README.md)
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+## Project layout
 
-```sh
-cd my-turborepo
-turbo dev
+```
+apps/
+  api/       # Express Storage Management API
+  mobile/    # Expo React Native client
 ```
 
-Without global `turbo`, use your package manager:
+## Notes
 
-```sh
-cd my-turborepo
-npx turbo dev
-npm exec turbo dev
-npm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-npm exec turbo dev --filter=web
-npm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-npm exec turbo login
-npm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-npm exec turbo link
-npm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- Uploaded files live on disk under `apps/api/uploads/` and are not committed.
+- If you previously ran the API in Docker as root, fix upload permissions before local nodemon can write (see `apps/api/server.js` startup check).
+- Google OAuth and email OTP need valid credentials in `apps/api/.env`.

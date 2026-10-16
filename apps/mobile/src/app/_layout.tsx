@@ -1,12 +1,12 @@
-import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+import { useColorScheme } from "react-native";
 
-import { ActionSheetHost } from '@/components/action-sheet';
-import { NamePromptHost } from '@/components/name-prompt';
-import { AppProviders, useAuth } from '@/lib/auth-context';
-import { VaultProvider } from '@/lib/vault-context';
+import { ActionSheetHost } from "@/components/action-sheet";
+import { NamePromptHost } from "@/components/name-prompt";
+import { AppProviders, useAuth } from "@/lib/auth-context";
+import { VaultProvider } from "@/lib/vault-context";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,7 +23,7 @@ function RootNavigator() {
   if (isLoading) return null;
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Protected guard={isAuthenticated}>
