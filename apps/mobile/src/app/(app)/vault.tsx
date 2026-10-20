@@ -11,7 +11,7 @@ import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { ApiError } from '@/lib/api/client';
 import { vaultApi } from '@/lib/api/endpoints';
-import { showFileActions, showFolderActions } from '@/lib/browser-actions';
+import { openUploadedFile, showFileActions, showFolderActions } from '@/lib/browser-actions';
 import { useVault } from '@/lib/vault-context';
 
 const ACCENT = '#1B6EF3';
@@ -153,6 +153,7 @@ export default function VaultScreen() {
             key={file._id}
             item={file}
             kind="file"
+            onPress={() => openUploadedFile(file)}
             onLongPress={() =>
               showFileActions(file, {
                 vaultPin: pin,

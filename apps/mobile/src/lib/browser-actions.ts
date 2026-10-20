@@ -1,5 +1,8 @@
 import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths, UploadType } from 'expo-file-system';
+import * as IntentLauncher from 'expo-intent-launcher';
+import { router } from 'expo-router';
+import * as Sharing from 'expo-sharing';
 import { Alert, Platform, Share } from 'react-native';
 
 import { showActionSheet } from '@/components/action-sheet';
@@ -9,6 +12,9 @@ import { favoritesApi, filesApi, foldersApi, vaultApi } from '@/lib/api/endpoint
 import { getApiBaseUrl } from '@/lib/config';
 import { loadTokens } from '@/lib/storage';
 import type { ApiEnvelope, FileItem, FolderItem } from '@/lib/types';
+
+/** Android Intent.FLAG_GRANT_READ_URI_PERMISSION — required for content:// handoff. */
+const FLAG_GRANT_READ_URI_PERMISSION = 1;
 
 const EXT_MIME: Record<string, string> = {
   jpg: 'image/jpeg',
@@ -123,6 +129,83 @@ export async function pickAndUpload(folderId?: string | null) {
   );
 }
 
+function resolveMimeType(file: FileItem): string {
+  return (
+    file.mimeType ||
+    EXT_MIME[file.name.split('.').pop()?.toLowerCase() ?? ''] ||
+    'application/octet-stream'
+  );
+}
+
+/** Download an authenticated file into the native cache (Android/iOS). */
+export async function downloadNativeFile(
+  file: FileItem,
+  vaultPin?: string | null,
+): Promise<File> {
+  const { accessToken } = await loadTokens();
+  const headers: Record<string, string> = {};
+  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+  if (vaultPin) headers['x-vault-pin'] = vaultPin;
+
+  const destination = new File(Paths.cache, `${file._id}-${safeFileName(file.name)}`);
+  return File.downloadFileAsync(
+    `${getApiBaseUrl()}/api/files/${file._id}/download`,
+    destination,
+    { headers, idempotent: true },
+  );
+}
+
+/** Download an authenticated file to a local URI (cache path or web blob URL). */
+export async function downloadFileLocal(
+  file: FileItem,
+  vaultPin?: string | null,
+): Promise<string> {
+  if (Platform.OS === 'web') {
+    const { blob } = await filesApi.download(file._id, vaultPin);
+    return URL.createObjectURL(blob);
+  }
+
+  const downloaded = await downloadNativeFile(file, vaultPin);
+  return downloaded.uri;
+}
+
+/**
+ * Open with a compatible viewer app (Android ACTION_VIEW).
+ * Falls back to the share sheet when no viewer is available.
+ */
+export async function openWithCompatibleApp(file: FileItem, vaultPin?: string | null) {
+  const mimeType = resolveMimeType(file);
+
+  if (Platform.OS === 'web') {
+    const uri = await downloadFileLocal(file, vaultPin);
+    globalThis.open?.(uri, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
+  const local = await downloadNativeFile(file, vaultPin);
+
+  if (Platform.OS === 'android') {
+    try {
+      await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+        data: local.contentUri,
+        type: mimeType,
+        flags: FLAG_GRANT_READ_URI_PERMISSION,
+      });
+      return;
+    } catch {
+      // No installed viewer for this MIME type — fall through to share.
+    }
+  }
+
+  if (await Sharing.isAvailableAsync()) {
+    await Sharing.shareAsync(local.uri, { mimeType, dialogTitle: file.name });
+    return;
+  }
+
+  await Share.share({ url: local.uri, title: file.name });
+}
+
+/** Share / save the file (share sheet — not the same as “Open with”). */
 export async function downloadAndShare(file: FileItem, vaultPin?: string | null) {
   if (Platform.OS === 'web') {
     const { blob, filename } = await filesApi.download(file._id, vaultPin);
@@ -135,22 +218,20 @@ export async function downloadAndShare(file: FileItem, vaultPin?: string | null)
     return;
   }
 
-  const { accessToken } = await loadTokens();
-  const headers: Record<string, string> = {};
-  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
-  if (vaultPin) headers['x-vault-pin'] = vaultPin;
+  const local = await downloadNativeFile(file, vaultPin);
+  const mimeType = resolveMimeType(file);
 
-  const destination = new File(Paths.cache, file.name);
-  const downloaded = await File.downloadFileAsync(
-    `${getApiBaseUrl()}/api/files/${file._id}/download`,
-    destination,
-    { headers, idempotent: true },
-  );
+  if (await Sharing.isAvailableAsync()) {
+    await Sharing.shareAsync(local.uri, { mimeType, dialogTitle: file.name });
+    return;
+  }
 
-  await Share.share({
-    url: downloaded.uri,
-    title: file.name,
-  });
+  await Share.share({ url: local.uri, title: file.name });
+}
+
+/** Navigate to the in-app preview / open screen for an uploaded file. */
+export function openUploadedFile(file: FileItem) {
+  router.push(`/files/preview/${file._id}`);
 }
 
 export async function createFolder(parentId?: string | null) {

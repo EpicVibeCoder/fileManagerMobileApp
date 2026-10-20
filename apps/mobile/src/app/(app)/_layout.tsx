@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 
 import {
   CalendarIcon,
@@ -43,9 +43,17 @@ export default function AppTabsLayout() {
         options={{
           title: 'Files',
           headerShown: false,
+          // Always open the Files root (list + header), not a leftover preview/folder screen.
+          href: '/files',
           tabBarIcon: ({ color, size }) => (
             <FilesIcon color={String(color)} size={size ?? 22} />
           ),
+        }}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            router.navigate('/files');
+          },
         }}
       />
       <Tabs.Screen

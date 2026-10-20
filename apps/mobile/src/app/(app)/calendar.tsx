@@ -18,6 +18,7 @@ import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { ApiError } from '@/lib/api/client';
 import { calendarApi } from '@/lib/api/endpoints';
+import { openUploadedFile } from '@/lib/browser-actions';
 
 const ACCENT = '#1B6EF3';
 
@@ -108,7 +109,12 @@ export default function CalendarScreen() {
           />
         ))}
         {files.map((file) => (
-          <FileRow key={file._id} item={file} kind="file" />
+          <FileRow
+            key={file._id}
+            item={file}
+            kind="file"
+            onPress={() => openUploadedFile(file)}
+          />
         ))}
       </ScrollView>
     </Screen>

@@ -12,6 +12,7 @@ import { ApiError } from '@/lib/api/client';
 import { foldersApi } from '@/lib/api/endpoints';
 import {
   createFolder,
+  openUploadedFile,
   pickAndUpload,
   showFileActions,
   showFolderActions,
@@ -121,6 +122,7 @@ export default function FolderScreen() {
             key={file._id}
             item={file}
             kind="file"
+            onPress={() => openUploadedFile(file)}
             onLongPress={() => showFileActions(file, { onChanged: refresh, vaultPin: pin })}
             onToggleFavorite={async () => {
               await toggleFileFavorite(file);

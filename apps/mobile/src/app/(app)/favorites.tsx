@@ -8,7 +8,11 @@ import { EmptyState, ErrorText, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { ApiError } from '@/lib/api/client';
 import { favoritesApi } from '@/lib/api/endpoints';
-import { toggleFileFavorite, toggleFolderFavorite } from '@/lib/browser-actions';
+import {
+  openUploadedFile,
+  toggleFileFavorite,
+  toggleFolderFavorite,
+} from '@/lib/browser-actions';
 
 const ACCENT = '#1B6EF3';
 
@@ -58,6 +62,7 @@ export default function FavoritesScreen() {
             key={file._id}
             item={file}
             kind="file"
+            onPress={() => openUploadedFile(file)}
             onToggleFavorite={async () => {
               await toggleFileFavorite(file);
               void query.refetch();

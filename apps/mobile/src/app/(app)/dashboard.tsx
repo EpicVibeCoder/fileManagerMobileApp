@@ -23,6 +23,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { ApiError } from '@/lib/api/client';
 import { dashboardApi } from '@/lib/api/endpoints';
 import { useAuth } from '@/lib/auth-context';
+import { openUploadedFile } from '@/lib/browser-actions';
 
 const ACCENT = '#1B6EF3';
 
@@ -139,6 +140,7 @@ export default function DashboardScreen() {
                   kind={kind}
                   onPress={() => {
                     if (kind === 'folder') router.push(`/files/${item._id}`);
+                    else openUploadedFile(item);
                   }}
                 />
               );
