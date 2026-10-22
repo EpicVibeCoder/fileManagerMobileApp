@@ -1,4 +1,4 @@
-<div align="center">
+
 
 # 🗂️ CloudBox — Mobile File Manager
 
@@ -7,16 +7,17 @@ Engineered with a high-performance **Express + MongoDB API** and a slick **Expo 
 
 ---
 
-[![Turborepo](https://img.shields.io/badge/Turborepo-2.x-000000?style=for-the-badge&logo=turborepo&logoColor=white)](https://turbo.build/repo)
-[![Expo](https://img.shields.io/badge/Expo-SDK_57-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
-[![React Native](https://img.shields.io/badge/React_Native-0.86-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactnative.dev/)
-[![Node.js](https://img.shields.io/badge/Node.js-24+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Latest-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-7.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+![Turborepo](https://img.shields.io/badge/Turborepo-2.x-000000?style=for-the-badge&logo=turborepo&logoColor=white)
+![Expo](https://img.shields.io/badge/Expo-SDK_57-000020?style=for-the-badge&logo=expo&logoColor=white)
+![React Native](https://img.shields.io/badge/React_Native-0.86-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Node.js](https://img.shields.io/badge/Node.js-24+-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Latest-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-7.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
-<br />
+  
+
 
 [✨ Features](#-features) •
 [🏛️ Architecture](#%EF%B8%8F-architecture) •
@@ -29,7 +30,7 @@ Engineered with a high-performance **Express + MongoDB API** and a slick **Expo 
 
 ---
 
-</div>
+
 
 ## 🌟 Overview
 
@@ -39,62 +40,11 @@ Engineered with a high-performance **Express + MongoDB API** and a slick **Expo 
 
 ## ✨ Features
 
-<table>
-  <tr>
-    <td width="50%">
-      <h3>📁 File & Folder Hierarchy</h3>
-      <ul>
-        <li><b>Concurrent Uploads:</b> Batch upload up to 50 files with MIME validation.</li>
-        <li><b>Smart Filtering:</b> Instant tabs for Images, PDFs, and Documents.</li>
-        <li><b>Nested Directory Trees:</b> Full breadcrumb and parent/child folder support.</li>
-        <li><b>Quick Actions:</b> Rename, duplicate, copy, delete, download, and share.</li>
-      </ul>
-    </td>
-    <td width="50%">
-      <h3>🔒 Biometric & PIN Vault</h3>
-      <ul>
-        <li><b>Dedicated Security Layer:</b> Encrypted 4-digit PIN access.</li>
-        <li><b>Hidden Files:</b> Vaulted items are strictly omitted from standard listings.</li>
-        <li><b>Secure Restore:</b> Verify PIN anytime before accessing or restoring private records.</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <h3>📊 Storage Dashboard & Insights</h3>
-      <ul>
-        <li><b>Visual Storage Meter:</b> Track disk space usage and tier limits.</li>
-        <li><b>Category Breakdown:</b> Detailed count and byte stats for images, PDFs, docs.</li>
-        <li><b>Recent Activity:</b> Quick jump into recently uploaded or accessed items.</li>
-      </ul>
-    </td>
-    <td width="50%">
-      <h3>📅 Temporal Calendar View</h3>
-      <ul>
-        <li><b>Date-Based Exploration:</b> Browse documents organized by creation date.</li>
-        <li><b>One-Tap Navigation:</b> Shift through days with forward/backward controls.</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <h3>⭐ Starred & Quick Access</h3>
-      <ul>
-        <li><b>Favorites Hub:</b> One-tap starring for high-priority documents and folders.</li>
-        <li><b>Cross-Referencing:</b> Access favorited files regardless of their parent folders.</li>
-      </ul>
-    </td>
-    <td width="50%">
-      <h3>🔐 Enterprise-Grade Authentication</h3>
-      <ul>
-        <li><b>JWT Token Pair:</b> Access token + secure refresh token rotation.</li>
-        <li><b>OTP Recovery:</b> Secure 6-digit email OTP password resets via Nodemailer.</li>
-        <li><b>Google OAuth 2.0:</b> Integrated social login workflow.</li>
-        <li><b>Defensive Security:</b> Helmet headers, CORS policies, and rate limiters.</li>
-      </ul>
-    </td>
-  </tr>
-</table>
+|                                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                        |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📁 File & Folder Hierarchy- **Concurrent Uploads:** Batch upload up to 50 files with MIME validation.- **Smart Filtering:** Instant tabs for Images, PDFs, and Documents.- **Nested Directory Trees:** Full breadcrumb and parent/child folder support.- **Quick Actions:** Rename, duplicate, copy, delete, download, and share. | 🔒PIN Vault- **Dedicated Security Layer:** Encrypted 4-digit PIN access.- **Hidden Files:** Vaulted items are strictly omitted from standard listings.- **Secure Restore:** Verify PIN anytime before accessing or restoring private records.                                                                         |
+| 📊 Storage Dashboard & Insights- **Visual Storage Meter:** Track disk space usage and tier limits.- **Category Breakdown:** Detailed count and byte stats for images, PDFs, docs.- **Recent Activity:** Quick jump into recently uploaded or accessed items.                                                                      | 📅 Temporal Calendar View- **Date-Based Exploration:** Browse documents organized by creation date.- **One-Tap Navigation:** Shift through days with forward/backward controls.                                                                                                                                       |
+| ⭐ Starred & Quick Access- **Favorites Hub:** One-tap starring for high-priority documents and folders.- **Cross-Referencing:** Access favorited files regardless of their parent folders.                                                                                                                                         | 🔐 Enterprise-Grade Authentication- **JWT Token Pair:** Access token + secure refresh token rotation.- **OTP Recovery:** Secure 6-digit email OTP password resets via Nodemailer.- **Google OAuth 2.0:** Integrated social login workflow.- **Defensive Security:** Helmet headers, CORS policies, and rate limiters. |
 
 ---
 
@@ -230,11 +180,11 @@ cp apps/mobile/.env.example apps/mobile/.env
 
 Set `EXPO_PUBLIC_API_URL` based on your development target:
 
-| Target Platform | `EXPO_PUBLIC_API_URL` |
-| :-------------- | :-------------------- |
-| **iOS Simulator / Web Browser** | `http://localhost:8080` |
-| **Android Emulator** | `http://10.0.2.2:8080` |
-| **Physical Phone (Expo Go via Wi-Fi)** | `http://<YOUR_LOCAL_LAN_IP>:8080` *(e.g., `http://192.168.1.50:8080`)* |
+| Target Platform                        | `EXPO_PUBLIC_API_URL`                                                    |
+| :------------------------------------- | :----------------------------------------------------------------------- |
+| **iOS Simulator / Web Browser**        | `http://localhost:8080`                                                  |
+| **Android Emulator**                   | `http://10.0.2.2:8080`                                                   |
+| **Physical Phone (Expo Go via Wi-Fi)** | `http://<YOUR_LOCAL_LAN_IP>:8080` *(e.g.,* `http://192.168.1.50:8080`*)* |
 
 > [!TIP]
 > Make sure your mobile device and computer are connected to the same Wi-Fi network when using your local LAN IP.
@@ -250,6 +200,7 @@ npm run dev
 ```
 
 This single command orchestrates:
+
 1. Automatically spins up **MongoDB** inside Docker via `docker-compose.mongo.yml`.
 2. Starts the **API** on `http://localhost:8080` with nodemon live reload.
 3. Launches the **Expo Dev Server** for the mobile app with tunnel / LAN ready.
@@ -274,6 +225,7 @@ npm run web        # Run in browser
 ```
 
 ### Mobile Highlights & Gestures
+
 - **Context Actions:** Long-press any file or folder row to trigger an action sheet:
   - ✏️ Rename
   - 📄 Duplicate
@@ -291,9 +243,11 @@ npm run web        # Run in browser
 The backend exposes a clean REST API running on `http://localhost:8080`.
 
 ### Health & Diagnostic
+
 - `GET /api/health` — Check server health and MongoDB connection state
 
 ### 🔐 Authentication
+
 - `POST /api/auth/signup` — Register a new account
 - `POST /api/auth/login` — Sign in with email and password
 - `POST /api/auth/refresh-token` — Rotate access token using refresh token
@@ -304,6 +258,7 @@ The backend exposes a clean REST API running on `http://localhost:8080`.
 - `GET /api/auth/google` — Trigger Google OAuth 2.0 flow
 
 ### 📁 Files Management
+
 - `GET /api/files` — List files (supports `?type=image|pdf|doc` and `?folderId=...`)
 - `GET /api/files/:id` — Get detailed metadata for a file
 - `POST /api/files/upload` — Multipart form-data upload (up to 50 files)
@@ -314,6 +269,7 @@ The backend exposes a clean REST API running on `http://localhost:8080`.
 - `DELETE /api/files/:id` — Permanently delete a file
 
 ### 📂 Folder Management
+
 - `GET /api/folders` — List folders (supports `?parentId=...` for nesting)
 - `POST /api/folders` — Create a new folder
 - `GET /api/folders/:id/files` — Fetch combined contents (subfolders + files)
@@ -321,19 +277,22 @@ The backend exposes a clean REST API running on `http://localhost:8080`.
 - `DELETE /api/folders/:id` — Delete folder
 
 ### 🔒 Vault
+
 - `POST /api/vault/pin` — Set or update the 4-digit Vault PIN
 - `POST /api/vault/verify` — Verify Vault PIN
-- `GET /api/vault` — Retrieve all vaulted files & folders *(requires `x-vault-pin` header)*
+- `GET /api/vault` — Retrieve all vaulted files & folders *(requires* `x-vault-pin` *header)*
 - `POST /api/vault/files/:id/move` — Move a file into the secret Vault
 - `POST /api/vault/folders/:id/move` — Move a folder into the secret Vault
 - `POST /api/vault/files/:id/restore` — Restore a file to regular storage
 - `POST /api/vault/folders/:id/restore` — Restore a folder to regular storage
 
 ### 📊 Dashboard & Calendar
+
 - `GET /api/dashboard` — Storage stats, quota limits, categorized counts, and recent files
 - `GET /api/calendar?date=YYYY-MM-DD` — Retrieve files created on a specific calendar date
 
 ### ⭐ Favorites
+
 - `GET /api/favorites` — List all favorited files and folders
 - `POST /api/favorites/files/:id` / `DELETE /api/favorites/files/:id` — Star / unstar file
 - `POST /api/favorites/folders/:id` / `DELETE /api/favorites/folders/:id` — Star / unstar folder
@@ -369,6 +328,7 @@ npm run docker:down
 
 > [!NOTE]
 > Uploaded files are mounted to the host filesystem under `apps/api/uploads/` (gitignored). If you switch between Docker and host nodemon, ensure the `uploads/` folder is writable by your host user:
+>
 > ```bash
 > docker run --rm -v "$PWD/apps/api/uploads:/uploads" alpine chown -R $(id -u):$(id -g) /uploads
 > ```
@@ -404,8 +364,6 @@ All workspace scripts are powered by **Turborepo** for optimal caching and paral
 
 ---
 
-<div align="center">
+
 
 Made with ❤️ for self-hosted cloud storage.
-
-</div>
